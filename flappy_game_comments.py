@@ -6,6 +6,7 @@
 #AK = Areebah Khokhar
 #NC = Natejvir Chahal 
 
+#AREEBAH'S SECTION 
 #AK: Importing necessary modules 
 import csv
 import random
@@ -212,6 +213,7 @@ def showWelcomeAnimation():
         'playerIndex': playerIndex
     }
 
+#ARLEEN'S SECTION 
 def mainGame(movementInfo):
     global wholecount,maxscore,epsilon
 
@@ -421,6 +423,7 @@ def mainGame(movementInfo):
         FPSCLOCK.tick(FPS)
 
 
+#NAVTEJVIR's SECTION 
 def showGameOverScreen(crashInfo):
     """crashes the player down ans shows gameover image"""
     score = crashInfo['score']
