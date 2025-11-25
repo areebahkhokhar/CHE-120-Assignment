@@ -7,7 +7,7 @@
 #NC = Natejvir Chahal 
 
 #AREEBAH'S SECTION 
-#AK: Importing necessary modules 
+#AK Importing necessary python modules needed for the game
 import csv
 import random
 import sys
@@ -18,31 +18,46 @@ import pygame
 from pygame.locals import QUIT, KEYDOWN, K_ESCAPE, K_SPACE, K_UP
 
 import numpy as np
+
+#AK Sets a seed for NumPy's pseudo-random number generator (to repeat numbers the same way each time)
 np.random.seed(1)
 
+#AK Display settings for the game such as, screenwidth and screenheight 
 FPS = 500
 SCREENWIDTH  = 288
 SCREENHEIGHT = 512
-# amount by which base can maximum shift to left
-PIPEGAPSIZE  = 100 # gap between upper and lower part of pipe
+#AK The distance between the lower and upper pipe 
+PIPEGAPSIZE  = 100 
+#AK Where the bottom/grass is located on the screen
 BASEY        = SCREENHEIGHT * 0.79
-# image, sound and hitmask  dicts
+
+#AK Dictionary for images, sound and hitmask variables
 IMAGES, SOUNDS, HITMASKS = {}, {}, {}
 
-
+#AK Variables for the games learning system 
 """
 learning
 """
 statefile="state"
+#AK Flappy birds learning rate
 alpha=1
+#AK Consideration of future rewards to be just as important as immediate rewards 
 gamma=1
+#AK Reward for surviving 
 survivereward = 1
+#AK Punishment for dying 
 deadreward = -200
+#AK Reward for passing a set of pipes
 passreward = 1
+#AK The birds memory of siutations and its performance
 Qmatrix={}
+#AK Keeps track of high score
 maxscore = 0
+#AK Counts total number of games played
 wholecount = 0
+#AK Interval after which the time of the game updates
 checktime=1
+#AK To define pixel value used for movement speed, size, or spacing 
 pix=10
 epsilon=0
 eps_dec=0.0001
