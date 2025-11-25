@@ -1,4 +1,4 @@
-FlappyBirdClone
+FlappyBirdClone CREDIT: https://github.com/zhaolingzhi/FlapPyBird-master.git 
 ===============
 
 A Flappy Bird Clone made using [python-pygame][1]
