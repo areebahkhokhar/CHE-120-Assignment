@@ -59,10 +59,13 @@ wholecount = 0
 checktime=1
 #AK To define pixel value used for movement speed, size, or spacing 
 pix=10
+#AK Flappy bird will only perform actions that it knows, it will never take random actions
 epsilon=0
+#AK The amount by which epsilon is reduced 
 eps_dec=0.0001
 
 # list of all possible players (tuple of 3 positions of flap)
+#AK List of all possible bird displays/designs (there are 3 different wing positions) 
 PLAYERS_LIST = (
     # red bird
     (
@@ -85,19 +88,19 @@ PLAYERS_LIST = (
     ),
 )
 
-# list of backgrounds
+#AK List if all the possible backgrounds (day or night)
 BACKGROUNDS_LIST = (
     'assets/sprites/background-day.png',
     'assets/sprites/background-night.png',
 )
 
-# list of pipes
+#AK List of all the possible pipe designs (red or green)
 PIPES_LIST = (
     'assets/sprites/pipe-green.png',
     'assets/sprites/pipe-red.png',
 )
 
-
+#AK Ensures xrange is compatible with Python 2 & Python 3 
 try:
     xrange
 except NameError:
@@ -108,10 +111,12 @@ def main():
     global SCREEN, FPSCLOCK
     pygame.init()
     FPSCLOCK = pygame.time.Clock()
+    #AK Creates the window/display for the game
     SCREEN = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT))
+    #AK Displays the title at the top of the screen 
     pygame.display.set_caption('Flappy Bird')
 
-    # numbers sprites for score display
+    #AK Number images to display the players score
     IMAGES['numbers'] = (
         pygame.image.load('assets/sprites/0.png').convert_alpha(),
         pygame.image.load('assets/sprites/1.png').convert_alpha(),
@@ -125,31 +130,33 @@ def main():
         pygame.image.load('assets/sprites/9.png').convert_alpha()
     )
 
-    # game over sprite
+    #AK Display to indicate that the game is over
     IMAGES['gameover'] = pygame.image.load('assets/sprites/gameover.png').convert_alpha()
-    # message sprite for welcome screen
+    #AK Display for welcoming player to the game
     IMAGES['message'] = pygame.image.load('assets/sprites/message.png').convert_alpha()
-    # base (ground) sprite
+    #AK Display for the ground 
     IMAGES['base'] = pygame.image.load('assets/sprites/base.png').convert_alpha()
 
-    # sounds
+    #AK Depending on the device the player is using, this chooses a sound file to play 
     if 'win' in sys.platform:
         soundExt = '.wav'
     else:
         soundExt = '.ogg'
-
+        
+    #AK Plays sound effects in the game 
     SOUNDS['die']    = pygame.mixer.Sound('assets/audio/die' + soundExt)
     SOUNDS['hit']    = pygame.mixer.Sound('assets/audio/hit' + soundExt)
     SOUNDS['point']  = pygame.mixer.Sound('assets/audio/point' + soundExt)
     SOUNDS['swoosh'] = pygame.mixer.Sound('assets/audio/swoosh' + soundExt)
     SOUNDS['wing']   = pygame.mixer.Sound('assets/audio/wing' + soundExt)
-
+    
+    #AK A loop that restarts the game once it has ended 
     while True:
-        # select random background sprites
+        #AK Selects a random background 
         randBg = 0
         IMAGES['background'] = pygame.image.load(BACKGROUNDS_LIST[randBg]).convert()
 
-        # select random player sprites
+        #AK Selects a random bird display (between 3 positions)
         randPlayer = 0
         IMAGES['player'] = (
             pygame.image.load(PLAYERS_LIST[randPlayer][0]).convert_alpha(),
@@ -157,7 +164,7 @@ def main():
             pygame.image.load(PLAYERS_LIST[randPlayer][2]).convert_alpha(),
         )
 
-        # select random pipe sprites
+        #AK Selects random pipes to display (the top pipe is the bottom just rotated)
         pipeindex = 0
         IMAGES['pipe'] = (
             pygame.transform.rotate(
@@ -166,19 +173,20 @@ def main():
         )
 
         # hismask for pipes
+        #AK Makes hitmasks that allows the game to detect when pixels collide with each other (ex. flappy bird hitting the pipe) 
         HITMASKS['pipe'] = (
             getHitmask(IMAGES['pipe'][0]),
             getHitmask(IMAGES['pipe'][1]),
         )
 
-        # hitmask for player
         HITMASKS['player'] = (
             getHitmask(IMAGES['player'][0]),
             getHitmask(IMAGES['player'][1]),
             getHitmask(IMAGES['player'][2]),
         )
-
+        #AK Displays the starting screen that welcomes the player
         movementInfo = showWelcomeAnimation()
+        #AK Begins the main gamr
         crashInfo = mainGame(movementInfo)
         #showGameOverScreen(crashInfo)
 
@@ -186,11 +194,12 @@ def main():
 def showWelcomeAnimation():
     """Shows welcome screen animation of flappy bird"""
     # index of player to blit on screen
+    #AK Which position the bird will be displayed (out of its three wing positions)
     playerIndex = 0
     playerIndexGen = cycle([0, 1, 2, 1])
-    # iterator used to change playerIndex after every 5th iteration
     loopIter = 0
-
+    
+    #AK Where the bird and message are initially located on the display screen 
     playerx = int(SCREENWIDTH * 0.2)
     playery = int((SCREENHEIGHT - IMAGES['player'][0].get_height()) / 2)
 
@@ -198,20 +207,22 @@ def showWelcomeAnimation():
     messagey = int(SCREENHEIGHT * 0.12)
 
     basex = 0
-    # amount by which base can maximum shift to left
+
+    #AK Used to make th eground pass/scroll by smoothly 
     baseShift = IMAGES['base'].get_width() - IMAGES['background'].get_width()
 
-    # player shm for up-down motion on welcome screen
+    #AK How much the bird animation floats up and down on the welcome screen
     playerShmVals = {'val': 0, 'dir': 1}
 
 
-    # adjust playery, playerIndex, basex
+    #AK Frequently updates the birds animation 
     if (loopIter + 1) % 5 == 0:
         playerIndex = next(playerIndexGen)
     loopIter = (loopIter + 1) % 30
     basex = -((-basex + 4) % baseShift)
+    #AK Allows the bird to float upwards & downwards
     playerShm(playerShmVals)
-    # draw sprites
+    #AK Draws all the sprites on the screen 
     SCREEN.blit(IMAGES['background'], (0,0))
     SCREEN.blit(IMAGES['player'][playerIndex],
                 (playerx, playery + playerShmVals['val']))
@@ -221,6 +232,7 @@ def showWelcomeAnimation():
     pygame.display.update()
     FPSCLOCK.tick(FPS)
 
+    #AK Returns the birds position at the start of each game
     return {
         'playery': playery + playerShmVals['val'],
         'basex': basex,
