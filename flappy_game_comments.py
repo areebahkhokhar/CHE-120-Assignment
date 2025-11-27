@@ -1,12 +1,13 @@
-#Department of Chemical Engineering, Faculty of Engineering
+#Department of Chemical Engineering
+#Faculty of Engineering
 #University of Waterloo
 #December 2, 2024 
 
 #AJ = Arleen Johal
 #AK = Areebah Khokhar
-#NC = Natejvir Chahal 
+#NKC = Natejvir Kaur Chahal, 21203534
 
-#AREEBAH'S SECTION 
+#AREEBAH SECTION
 #AK Importing necessary python modules needed for the game
 import csv
 import random
@@ -450,165 +451,170 @@ def mainGame(movementInfo):
         FPSCLOCK.tick(FPS)
 
 
-#NAVTEJVIR's SECTION 
+#NAVTEJVIR'S SECTION 
 def showGameOverScreen(crashInfo):
     """crashes the player down ans shows gameover image"""
-    score = crashInfo['score']
-    playerx = SCREENWIDTH * 0.2
-    playery = crashInfo['y']
-    playerHeight = IMAGES['player'][0].get_height()
-    playerVelY = crashInfo['playerVelY']
-    playerAccY = 2
-    playerRot = crashInfo['playerRot']
-    playerVelRot = 7
+    score = crashInfo['score'] #NKC: From crashInfo dictionary, score value is assigned to display final score to player
+    playerx = SCREENWIDTH * 0.2 #NKC: Bird position is determined to be 20% of screenwidth. Position to left ensures time for user to predict action according to obstacles to the right/ahead.
+    playery = crashInfo['y'] #NKC: Current vertical coordinate of bird in crashInfo recorded prior to crash in order to commence and continue at approperite positon following crash.
+    playerHeight = IMAGES['player'][0].get_height() #NKC: Bird height is determined as the the height of the first bird image in order to determine if bird comes into contact with obstacles.
+    playerVelY = crashInfo['playerVelY'] #NKC: Vertical velocity ensures consistent animation of crash.
+    playerAccY = 2 #NKC: Graviational acceleration to ensure descent of bird. Value of 2 ensures consistent animation with sufficient reaction time for player.
+    playerRot = crashInfo['playerRot'] #NKC: Rotation angle determined from rotation angle of crash.
+    playerVelRot = 7 #NKC: Rotational velocity for consistent animation of loss of control to user.
 
-    basex = crashInfo['basex']
+    basex = crashInfo['basex'] #NKC: Current horizontal coordinate of bird in crashInfo recorded at crash in order to commence and continue at approperiate position following crash.
 
-    upperPipes, lowerPipes = crashInfo['upperPipes'], crashInfo['lowerPipes']
+    upperPipes, lowerPipes = crashInfo['upperPipes'], crashInfo['lowerPipes'] #NKC: Redraw pipes according to positions at the time of the crash.
 
     # play hit and die sounds
-    SOUNDS['hit'].play()
-    if not crashInfo['groundCrash']:
-        SOUNDS['die'].play()
+    SOUNDS['hit'].play() #NKC: 'hit' audio in SOUNDS dictionary played using method.
+    if not crashInfo['groundCrash']: #NKC: Determine if crash with pipe to play approperiate audio.
+        SOUNDS['die'].play() #NKC: 'die' audio in SOUNDS dictionary played using method. Different sound emphazies emotional impact to indicate game loss in contrast to hit.
 
-    while True:
-        for event in pygame.event.get():
-            if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
-                pygame.quit()
-                sys.exit()
-            if event.type == KEYDOWN and (event.key == K_SPACE or event.key == K_UP):
-                if playery + playerHeight >= BASEY - 1:
-                    return
+    while True: #NKC: Initates infinte loop to remain in game-over display until player inputs decision to restart or quit.
+        for event in pygame.event.get(): #NKC: Retrieves and processes all player inputs/actions.
+            if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):#NKC: Player quits (close window, escape key)
+                pygame.quit() #NKC: Closes game
+                sys.exit() #NKC: Exits program
+            if event.type == KEYDOWN and (event.key == K_SPACE or event.key == K_UP): #NKC: Player restarts (space bar, up arrow)
+                if playery + playerHeight >= BASEY - 1: #NKC: Compares vertical coordinate of bird to ground position to ensure restarts following crash/contact with ground.
+                    return #NKC: Exit game-over display to restart
 
         # player y shift
-        if playery + playerHeight < BASEY - 1:
-            playery += min(playerVelY, BASEY - playery - playerHeight)
+        if playery + playerHeight < BASEY - 1: #NKC: Bird is above ground, so possibility of descent is physically possible.
+            playery += min(playerVelY, BASEY - playery - playerHeight) #NKC: Updates vertical coordinate of bird according to smallest value of vertical velcoity or distance from ground. Minimum prevents bird surpassing ground depth.
 
         # player velocity change
-        if playerVelY < 15:
-            playerVelY += playerAccY
+        if playerVelY < 15: #NKC: Verifies that vertical velocity does not surpass maximum of 15.
+            playerVelY += playerAccY #NKC: Increases vertical velocity by acceleration due to gravity for consistent descent animation.
 
         # rotate only when it's a pipe crash
-        if not crashInfo['groundCrash']:
-            if playerRot > -90:
-                playerRot -= playerVelRot
+        if not crashInfo['groundCrash']: #NKC: Verifies crash with pipe, so rotation required.
+            if playerRot > -90: #NKC: Verification of current rotation of bird compared with limit of -90 degrees (pointing straight down).
+                playerRot -= playerVelRot #NKC: If rotation surpasses limit, current rotation is reduced by rotation velocity.
 
         # draw sprites
-        SCREEN.blit(IMAGES['background'], (0,0))
+        SCREEN.blit(IMAGES['background'], (0,0)) #NKC: Retrieves background image from MEMORY dictionary to display at (0,0) coordinates. Ensures consistent animation between frames.
 
-        for uPipe, lPipe in zip(upperPipes, lowerPipes):
-            SCREEN.blit(IMAGES['pipe'][0], (uPipe['x'], uPipe['y']))
+        for uPipe, lPipe in zip(upperPipes, lowerPipes): #NKC: All pipes redrawn for crash
+            SCREEN.blit(IMAGES['pipe'][0], (uPipe['x'], uPipe['y'])) #NKC: Retrieves pipe from IMAGE dictionary to display at location determined by dictionary values of horizontal and vertical coordinates.
             SCREEN.blit(IMAGES['pipe'][1], (lPipe['x'], lPipe['y']))
 
-        SCREEN.blit(IMAGES['base'], (basex, BASEY))
-        showScore(score)
+        SCREEN.blit(IMAGES['base'], (basex, BASEY)) #NKC: Redraws image of ground at horixontal and vertical fixed coordinates.
+        showScore(score) #NKC: Displays current score to player to inform regarding performance.
 
-        playerSurface = pygame.transform.rotate(IMAGES['player'][1], playerRot)
-        SCREEN.blit(playerSurface, (playerx,playery))
+        playerSurface = pygame.transform.rotate(IMAGES['player'][1], playerRot) #NKC: Current rotation angle applied to bird image from IMAGES dictionary.
+        SCREEN.blit(playerSurface, (playerx,playery)) #NKC: Rotated bird image displayed at horizontal and vertical coordinates for consistent animation of crash.
 
-        FPSCLOCK.tick(FPS)
-        pygame.display.update()
-
+        FPSCLOCK.tick(FPS) #NKC: Limits flame display rate so all animations change display smoothly.
+        pygame.display.update() #NKC: Displays updated frame to player
 
 def playerShm(playerShm):
     """oscillates the value of playerShm['val'] between 8 and -8"""
-    if abs(playerShm['val']) == 8:
-        playerShm['dir'] *= -1
+    if abs(playerShm['val']) == 8: #NKC: If oscillation of bird in one direction reaches maximum (-8 or 8), must reverse direction.
+        playerShm['dir'] *= -1 #NKC: Reverses oscillation direction of bird.
+        #NKC: Oscillation provides consistent natural animation of bird movement.
 
-    if playerShm['dir'] == 1:
-         playerShm['val'] += 1
-    else:
-        playerShm['val'] -= 1
-
+    if playerShm['dir'] == 1: #NKC: Verifies direction key of playerShm dictionary is up (1).
+         playerShm['val'] += 1 #NKC: Increases vertical displacement by 1, so bird increases vertical position in each frame.
+    else: #NKC: Otherwise (if not moving up), vertical direction of bird is down.
+        playerShm['val'] -= 1 #NKC: Decreases vertical displacement by 1, so bird decreases vertical position in each frame.
 
 def getRandomPipe():
     """returns a randomly generated pipe"""
     # y of gap between upper and lower pipe
-    gapY = random.randrange(0, int(BASEY * 0.6 - PIPEGAPSIZE))
-    gapY += int(BASEY * 0.2)   #lower 0.2~0.8 pipe
-    pipeHeight = IMAGES['pipe'][0].get_height()
-    pipeX = SCREENWIDTH + 10
+    gapY = random.randrange(0, int(BASEY * 0.6 - PIPEGAPSIZE)) #NKC: Generates random vertical position for pipe gap within range of playable area of display.
+    #NKC: Playable area is in vertical range above 60% of ground, accounting for sufficient space for the determined size of the gap.
+    gapY += int(BASEY * 0.2) #lower 0.2~0.8 pipe
+    #NKC: Ensures gap remains within 20% to 80% of screen height for safe passage of bird by player.
+    pipeHeight = IMAGES['pipe'][0].get_height()  #NKC: Retrieves height of pipe image for correct positioning on display.
+    pipeX = SCREENWIDTH + 10 #NKC: Positions pipe beyond screen display boundary towards right to ensure consistent enterance animation during gameplay.
 
     return [
-        {'x': pipeX, 'y': gapY - pipeHeight},  # upper pipe
-        {'x': pipeX, 'y': gapY + PIPEGAPSIZE}, # lower pipe
+        {'x': pipeX, 'y': gapY - pipeHeight},  # upper pipe above gap
+        {'x': pipeX, 'y': gapY + PIPEGAPSIZE}, # lower pipe below gap
     ]
 
 
 def showScore(score):
     """displays score in center of screen"""
-    scoreDigits = [int(x) for x in list(str(score))]
-    totalWidth = 0 # total width of all numbers to be printed
+    scoreDigits = [int(x) for x in list(str(score))] #NKC: Converts/splits score into list of digits for indvidual display of digits.
+    totalWidth = 0 #NKC: Total width of all numbers to be printed
 
-    for digit in scoreDigits:
-        totalWidth += IMAGES['numbers'][digit].get_width()
+    for digit in scoreDigits: #NKC: Calculates total width of score to ensure display in centre.
+        totalWidth += IMAGES['numbers'][digit].get_width() #NKC: Width of each indvidual digit from IMAGES dictionary is summed to determine total width of score.
 
-    Xoffset = (SCREENWIDTH - totalWidth) / 2
+    Xoffset = (SCREENWIDTH - totalWidth) / 2 #NKC: Calculates horizontal centred position of score by finding the midpoint between the difference of the screen width and score width.
 
-    for digit in scoreDigits:
-        SCREEN.blit(IMAGES['numbers'][digit], (Xoffset, SCREENHEIGHT * 0.1))
-        Xoffset += IMAGES['numbers'][digit].get_width()
+    for digit in scoreDigits: #NKC: Loop to display each digit.
+        SCREEN.blit(IMAGES['numbers'][digit], (Xoffset, SCREENHEIGHT * 0.1)) #NKC: Displays each digit image at the calculated horizontal centre position and fixed vertical position (10% below screenheight/top).
+        Xoffset += IMAGES['numbers'][digit].get_width() #NKC: Increases horizontal position by current digit width in order to determine horizontal position of next digit.
 
 
 def checkCrash(player, upperPipes, lowerPipes):
     """returns True if player collders with base or pipes."""
-    pi = player['index']
-    player['w'] = IMAGES['player'][0].get_width()
-    player['h'] = IMAGES['player'][0].get_height()
+    pi = player['index'] #NKC: Current bird animation frame retrieved from player dictionary at time of possible crash.
+    player['w'] = IMAGES['player'][0].get_width() #NKC: Stores width of bird animation image.
+    player['h'] = IMAGES['player'][0].get_height() #NKC: Stores height of bird animation image.
+    #NKC: Note that the dimensions of the bird animation image are recorded in order to determine if the bird overlaps/crashes into other obstacles (the ground or pipes).
 
     # if player crashes into ground
-    if player['y'] + player['h'] >= BASEY - 1:
-        return [True, True]
+    if player['y'] + player['h'] >= BASEY - 1: #NKC: Verifies if the bottom vertical position (top vertical position- height) of the bird image is at or surpasses ground depth.
+        return [True, True] #NKC: Crash occurs with ground
     else:
-
         playerRect = pygame.Rect(player['x'], player['y'],
-                      player['w'], player['h'])
-        pipeW = IMAGES['pipe'][0].get_width()
-        pipeH = IMAGES['pipe'][0].get_height()
+                      player['w'], player['h']) #NKC: Creates a rectangle commencing at the left horizontal position extended by the width and the top vertical position extended by the height of the bird animation image.
+        pipeW = IMAGES['pipe'][0].get_width() #NKC: Retrieves and stores width of pipe from IMAGE dictionary to chcek for overlap indicating crash.
+        pipeH = IMAGES['pipe'][0].get_height() #NKC: Retrieves and stores height of pipe from IMAGE dictionary to chcek for overlap indicating crash.
 
-        for uPipe, lPipe in zip(upperPipes, lowerPipes):
+        for uPipe, lPipe in zip(upperPipes, lowerPipes): #NKC: Multiple assignment enhances efficiency and readability
             # upper and lower pipe rects
-            uPipeRect = pygame.Rect(uPipe['x'], uPipe['y'], pipeW, pipeH)
-            lPipeRect = pygame.Rect(lPipe['x'], lPipe['y'], pipeW, pipeH)
+            uPipeRect = pygame.Rect(uPipe['x'], uPipe['y'], pipeW, pipeH) #NKC: Creates a rectangle commencing at the left horizontal position extended by the width and the top vertical position extended by the height of the upper pipe image.
+            lPipeRect = pygame.Rect(lPipe['x'], lPipe['y'], pipeW, pipeH) #NKC: Creates a rectangle commencing at the left horizontal position extended by the width and the top vertical position extended by the height of the lower pipe image.
 
             # player and upper/lower pipe hitmasks
+            #NKC: Hitmasks mark where pixels of images are solid vs transparent.
             pHitMask = HITMASKS['player'][pi]
             uHitmask = HITMASKS['pipe'][0]
             lHitmask = HITMASKS['pipe'][1]
 
             # if bird collided with upipe or lpipe
+            #NKC: As a reuslt, crash is registered according to the overlap of solid pixels of images.
             uCollide = pixelCollision(playerRect, uPipeRect, pHitMask, uHitmask)
             lCollide = pixelCollision(playerRect, lPipeRect, pHitMask, lHitmask)
 
-            if uCollide or lCollide:
-                return [True, False]
+            if uCollide or lCollide: #If crash occurs between upper pipe or lower pipe
+                return [True, False] #Crash occurs with pipe (not ground)
 
-    return [False, False]
+    return [False, False] #No crash (with ground or pipe)
+    #NKC: Note that the first boolean value confirms whether a crash has occured or not; whereas, the second boolean value indicates the type of crash.
 
 def pixelCollision(rect1, rect2, hitmask1, hitmask2):
     """Checks if two objects collide and not just their rects"""
-    rect = rect1.clip(rect2)
+    rect = rect1.clip(rect2) #NKC: Determines overlap between two rectangles
 
-    if rect.width == 0 or rect.height == 0:
-        return False
-
+    if rect.width == 0 or rect.height == 0: #NKC: If either dimension of rectangle are 0, there is no overlap.
+        return False #NKC: No overlap indicates that objects do not collide.
+        
+    #NKC: Positions of overlapping pixels of images
     x1, y1 = rect.x - rect1.x, rect.y - rect1.y
     x2, y2 = rect.x - rect2.x, rect.y - rect2.y
 
-    for x in xrange(rect.width):
-        for y in xrange(rect.height):
+    for x in xrange(rect.width): #NKC: Scan each overlap pixel horizontally
+        for y in xrange(rect.height): #NKC: Scan each overlap pixel vertically
             if hitmask1[x1+x][y1+y] and hitmask2[x2+x][y2+y]:
-                return True
-    return False
+                return True #NKC: If any pixels of overlap are solid, objects collide.
+    return False #NKC: If any pixels of overlap are transparent, objects do not collide.
 
 def getHitmask(image):
     """returns a hitmask using an image's alpha."""
     mask = []
-    for x in xrange(image.get_width()):
+    for x in xrange(image.get_width()): #NKC: Scan each overlap pixel horizontally
         mask.append([])
-        for y in xrange(image.get_height()):
+        for y in xrange(image.get_height()): #NKC: Scan each overlap pixel vertically
             mask[x].append(bool(image.get_at((x,y))[3]))
     return mask
 
-if __name__ == '__main__':
-    main()
+if __name__ == '__main__': #NKC: When program is run directly/scripted (not imported) the following is executed:
+    main() #NKC: Main game loop
